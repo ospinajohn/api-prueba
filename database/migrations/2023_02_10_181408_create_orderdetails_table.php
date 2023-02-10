@@ -20,9 +20,6 @@ return new class extends Migration {
             $table->integer('product_id')->unsigned(); // Relación con la tabla products
             $table->foreign('product_id')->references('id')->on('products'); // Llave foránea
 
-            $table->integer('order_id')->unsigned(); // Relación con la tabla orders
-            $table->foreign('order_id')->references('id')->on('orders'); // Llave foránea
-
             $table->timestamps();
         });
     }

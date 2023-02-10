@@ -8,8 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable
-{
+class User extends Authenticatable {
     use HasApiTokens, HasFactory, Notifiable;
 
     /**
@@ -17,10 +16,15 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
+
+    // aqui en el models user.php se agregan los campos que se van a llenar en la tabla de la base de datos y se agregan los campos que se van a ocultar como el password y el remember_token, por otro lado se agregan los campos que se van a convertir en un tipo de dato especifico como el email_verified_at que se va a convertir en un datetime
+
     protected $fillable = [
-        'name',
-        'email',
+        'nombre',
+        'correo',
+        'telefono',
         'password',
+        'rol'
     ];
 
     /**
