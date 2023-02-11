@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -24,4 +25,15 @@ Route::get('/test', function () {
     return json_encode(['name' => 'Hello World']);
 });
 
-Route::resource('user', UserController::class);
+// Rutas de usuarios
+Route::get('/users', [UserController::class, 'index']);
+Route::post('/user/register', [UserController::class, 'store']);
+Route::post('/login', [UserController::class, 'login']);
+Route::get('/user/{id}', [UserController::class, 'show']);
+Route::put('/user/{id}', [UserController::class, 'update']);
+Route::delete('/user/{id}', [UserController::class, 'destroy']);
+
+// Rutas de productos
+Route::get('/products', [ProductController::class, 'index']);
+Route::post('/product', [ProductController::class, 'store']);
+Route::get('/product/{id}', [ProductController::class, 'show']);
