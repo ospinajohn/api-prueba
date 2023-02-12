@@ -31,7 +31,7 @@ class Order extends Model {
 
     public function orderdetail() {
         // belongsTo() es para una relacion de uno a muchos y hasMany() es para una relacion de muchos a uno y hasOne() es para una relacion de uno a uno
-        return $this->belongsTo(OrderDetail::class);
+        return $this->belongsTo(Orderdetail::class);
     }
 
     
