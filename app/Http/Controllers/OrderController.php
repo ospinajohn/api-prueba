@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Validator;
 
 class OrderController extends Controller {
@@ -18,11 +19,15 @@ class OrderController extends Controller {
                 )
                 ->get();
 
+            // recibir el usuario que viene por el header de token
+            $user = Auth::user();
+
             return response()->json(
                 [
                     'message' => 'Ordenes obtenidas correctamente',
                     'status'  => 'success',
                     'data'    => $orders,
+                    'user'    => $user,
 
                 ], 200
 
@@ -52,8 +57,6 @@ class OrderController extends Controller {
                 'user_id'        => 'required',
                 'orderdetail_id' => 'required',
                 'total'          => 'required',
-                'estado'         => 'required',
-                'fecha'          => 'required',
             ]);
 
             if ($validator->fails()) {
@@ -67,7 +70,13 @@ class OrderController extends Controller {
                 );
             }
 
-            $order = Order::create($request->all());
+            $order = new Order();
+            $order->user_id = $request->user_id;
+            $order->orderdetail_id = $request->orderdetail_id;
+            $order->total = $request->total;
+            $order->estado = 'pendiente';
+            $order->fecha = date('Y-m-d H:i:s');
+            $order->save();
 
             return response()->json(
                 [
@@ -146,85 +155,11 @@ class OrderController extends Controller {
 
 
     public function update(Request $request, $id) {
-        try {
-            $validator = Validator::make($request->all(), [
-                'user_id'        => 'required',
-                'orderdetail_id' => 'required',
-                'total'          => 'required',
-                'estado'         => 'required',
-                'fecha'          => 'required',
-            ]);
-
-            if ($validator->fails()) {
-                return response()->json(
-                    [
-                        'message' => 'Error al actualizar la orden',
-                        'status'  => 'error',
-                        'data'    => $validator->errors(),
-
-                    ], 500
-                );
-            }
-
-            $exists = Order::where('id', $id)->exists();
-
-            if (!$exists) {
-                return response()->json(
-                    [
-                        'message' => 'Error al actualizar la orden',
-                        'status'  => 'error',
-                        'data'    => 'La orden por este id no existe',
-
-                    ], 500
-                );
-            }
-
-            $order = Order::find($id);
-            $order->update($request->all());
-        }
+        //
     }
 
     public function destroy($id) {
-        try {
-
-            $exists = Order::where('id', $id)->exists();
-
-            if (!$exists) {
-                return response()->json(
-                    [
-                        'message' => 'Error al eliminar la orden',
-                        'status'  => 'error',
-                        'data'    => 'La orden por este id no existe',
-
-                    ], 500
-                );
-            }
-
-            $order = Order::find($id);
-            $order->delete();
-
-            return response()->json(
-                [
-                    'message' => 'Orden eliminada correctamente',
-                    'status'  => 'success',
-                    'data'    => $order,
-
-                ], 200
-
-            );
-
-        } catch (\Throwable $th) {
-
-            return response()->json(
-                [
-                    'message' => 'Error al eliminar la orden',
-                    'status'  => 'error',
-                    'data'    => $th->getMessage(),
-
-                ], 500
-            );
-
-        }
+        //
     }
 
     public function getOrdersByUser($id) {
@@ -249,6 +184,8 @@ class OrderController extends Controller {
 
             // sumar el total de orderdetails
             $totalSum = $orderdetails->sum('total');
+
+
 
 
 

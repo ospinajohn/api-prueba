@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Hash;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use PhpParser\Node\Stmt\TryCatch;
 use Validator;
 
@@ -132,25 +134,70 @@ class UserController extends Controller {
     }
 
     public function login(Request $request) {
-        $data = User::where('correo', '=', $request->correo)->first();
+        $credentials = $request->validate([
+            'correo'   => ['required', 'email'],
+            'password' => ['required'],
+        ]);
 
-        if ($data) {
-            if ($data->password == $request->password) {
-                return response()->json([
-                    'data' => $data,
-                    'msg'  => 'Logueado correctamente'
-                ], 200);
-            } else {
-                return response()->json([
-                    'error' => 'Contraseña incorrecta',
-                    'msg'   => 'No se pudo loguear'
-                ], 500);
-            }
+        if (Auth::attempt($credentials)) {
+            $user = Auth::user(); // obtener el usuario autenticado
+            $token = $user->createToken('token-name')->plainTextToken; // crear el token
+            $cookie = cookie('jwt', $token, 60 * 24); // crear la cookie
+
+            return response()->json([
+                'msg'    => 'Login correcto',
+                'status' => 'success',
+                'data'   => $user,
+                'token'  => $token,
+            ], 200)->withCookie($cookie);
         } else {
             return response()->json([
-                'error' => 'Usuario no encontrado',
-                'msg'   => 'No se pudo loguear'
+                'msg'    => 'Credenciales incorrectas',
+                'status' => 'error',
+                'data'   => null
+            ], 401);
+        }
+    }
+
+    public function register(Request $request) {
+        try {
+            $validator = Validator::make($request->all(), [
+                'nombre'   => 'required|string',
+                'correo'   => 'required|string|email|max:255|unique:users',
+                'password' => 'required|string|min:6',
+                'telefono' => 'required|string',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'error' => $validator->errors(),
+                    'msg'   => 'No se pudo registrar'
+                ], 500);
+            }
+
+            $password = Hash::make($request->get('password'));
+
+            // crear el usuario
+            $user = User::create([
+                'nombre'   => $request->get('nombre'),
+                'correo'   => $request->get('correo'),
+                'password' => $password,
+                'telefono' => $request->get('telefono'),
+            ]);
+
+
+            return response()->json([
+                'msg'    => 'Registrado correctamente',
+                'status' => 'success',
+                'data'   => $user
+            ], 201);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage(),
+                'msg'   => 'No se pudo registrar'
             ], 500);
+
         }
     }
 }
