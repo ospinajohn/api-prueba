@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Orderdetail;
 use App\Models\Product;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Validator;
 
 class OrderdetailController extends Controller {
@@ -308,4 +310,5 @@ class OrderdetailController extends Controller {
             );
         }
     }
+
 }

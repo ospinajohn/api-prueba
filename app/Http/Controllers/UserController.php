@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Cookie;
 use Hash;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -139,7 +140,7 @@ class UserController extends Controller {
             'password' => ['required'],
         ]);
 
-        if (Auth::attempt($credentials)) {
+        if (Auth::attempt($credentials)) { // verificar las credenciales y la fun attempt es para verificar si las credenciales son correctas 
             $user = Auth::user(); // obtener el usuario autenticado
             $token = $user->createToken('token-name')->plainTextToken; // crear el token
             $cookie = cookie('jwt', $token, 60 * 24); // crear la cookie
@@ -199,5 +200,15 @@ class UserController extends Controller {
             ], 500);
 
         }
+    }
+
+    public function logout(Request $request) {
+        $cookie = Cookie::forget('jwt');
+
+        return response()->json([
+            'msg'    => 'Logout correcto',
+            'status' => 'success',
+            'data'   => null
+        ], 200)->withCookie($cookie);
     }
 }

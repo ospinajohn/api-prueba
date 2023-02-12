@@ -12,7 +12,7 @@ class Authenticate extends Middleware {
      * @param  \Illuminate\Http\Request  $request
      * @return string|null
      */
-    protected function redirectTo($request) {
+    protected function redirectTo($request) { // este metodo es para redireccionar a la ruta de login
         if (!$request->expectsJson()) {
             return route('login');
         }
@@ -29,4 +29,6 @@ class Authenticate extends Middleware {
         $this->authenticate($request, $guards);
         return $next($request);
     }
+
+    
 }
