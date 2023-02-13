@@ -155,7 +155,59 @@ class OrderController extends Controller {
 
 
     public function update(Request $request, $id) {
-        //
+        try {
+
+            // validar los datos
+            $validator = Validator::make($request->all(), [
+                'estado' => 'required',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(
+                    [
+                        'message' => 'Error al actualizar la orden',
+                        'status'  => 'error',
+                        'data'    => $validator->errors(),
+
+                    ], 500
+                );
+            }
+
+            $exists = Order::where('id', $id)->exists();
+            if (!$exists) {
+                return response()->json(
+                    [
+                        'message' => 'Error al actualizar la orden',
+                        'status'  => 'error',
+                        'data'    => 'La orden por este id no existe',
+
+                    ], 500
+                );
+            }
+
+            $order = Order::find($id);
+            $order->estado = $request->estado;
+            $order->save();
+
+            return response()->json(
+                [
+                    'message' => 'Orden actualizada correctamente',
+                    'status'  => 'success',
+                    'data'    => $order,
+
+                ], 200
+            );
+
+        } catch (\Throwable $th) {
+            return response()->json(
+                [
+                    'message' => 'Error al actualizar la orden',
+                    'status'  => 'error',
+                    'data'    => $th->getMessage(),
+
+                ], 500
+            );
+        }
     }
 
     public function destroy($id) {
