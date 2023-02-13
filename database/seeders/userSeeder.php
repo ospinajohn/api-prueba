@@ -18,22 +18,22 @@ class userSeeder extends Seeder {
             [
                 'nombre'   => 'Admin',
                 'correo'   => 'admin@gmail.com',
-                'password' => \Hash::make('12345678'),
-                'telefono' => 123456789,
+                'password' => \Hash::make('123456'),
+                'telefono' => 123456,
                 'rol'      => 'admin',
             ],
             [
                 'nombre'   => 'John James',
                 'correo'   => 'ospina@gmail.com',
-                'password' => \Hash::make('12345678'),
-                'telefono' => 123456789,
-                'rol'      => 'cliente',
+                'password' => \Hash::make('123456'),
+                'telefono' => 123456,
+                'rol'      => 'supervisor',
             ],
             [
-                'name'     => 'Leiner Felipe',
-                'email'    => 'leiner@gmail.com',
-                'password' => \Hash::make('12345678'),
-                'telefono' => 123456789,
+                'name'     => 'Prueba - Test',
+                'email'    => 'prueba@gmail.com',
+                'password' => \Hash::make('123456'),
+                'telefono' => 123456,
                 'rol'      => 'cliente',
             ]
         ]);

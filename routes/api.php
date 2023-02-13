@@ -21,22 +21,22 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/password/forgot', [UserController::class, 'forgot']);
     Route::put('/password/reset', [UserController::class, 'reset']);
     Route::put('/me/updatePassword', [UserController::class, 'updatePassword']);
+    Route::post('/logout', [UserController::class, 'logout']);
 });
 
 
 
-Route::middleware(['auth:sanctum', 'rol:admin,supervisor,cliente'])->group(function () {
+Route::middleware(['auth:sanctum', 'rol:admin'])->group(function () {
     Route::post('/user/new', [UserController::class, 'store']);
     Route::get('/user/{id}', [UserController::class, 'show']);
     Route::put('/user/{id}', [UserController::class, 'update']);
     Route::delete('/user/{id}', [UserController::class, 'destroy']);
     Route::get('/users', [UserController::class, 'index']);
-    Route::post('/logout', [UserController::class, 'logout']);
+    Route::get('/admin/users', [UserController::class, 'indexAdmin']);
 });
 
 // admin
 Route::middleware(['auth:sanctum', 'rol:admin'])->group(function () {
-    Route::get('/admin/users', [UserController::class, 'indexAdmin']);
 });
 
 // Rutas de productos
@@ -53,10 +53,14 @@ Route::middleware(['auth:sanctum', 'rol:admin,supervisor'])->group(function () {
 
 
 //Rutas orderdetails
-Route::middleware(['auth:sanctum', 'rol:admin,supervisor,cliente'])->group(function () {
-    Route::get('/orderdetails', [OrderdetailController::class, 'index']);
+Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/orderdetail', [OrderdetailController::class, 'store']);
     Route::get('/orderdetail/{id}', [OrderdetailController::class, 'show']);
+});
+
+// Rutas de orderdetails para admin y supervisor
+Route::middleware(['auth:sanctum', 'rol:admin,supervisor'])->group(function () {
+    Route::get('/orderdetails', [OrderdetailController::class, 'index']);
     Route::put('/orderdetail/{id}', [OrderdetailController::class, 'update']);
     Route::delete('/orderdetail/{id}', [OrderdetailController::class, 'destroy']); // esta todavia no esta hecha 
 });
