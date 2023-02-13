@@ -7,6 +7,7 @@ use Cookie;
 use Hash;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use PhpParser\Node\Stmt\TryCatch;
 use Validator;
 
@@ -167,6 +168,7 @@ class UserController extends Controller {
                 'correo'   => 'required|string|email|max:255|unique:users',
                 'password' => 'required|string|min:6',
                 'telefono' => 'required|string',
+                'imagen'  => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             ]);
 
             if ($validator->fails()) {
@@ -177,6 +179,12 @@ class UserController extends Controller {
             }
 
             $password = Hash::make($request->get('password'));
+
+            // recibir la imagen y guardarla en el servidor
+            $imagen = $request->file('imagen');
+            $nombreImagen = time() . '.' . $imagen->getClientOriginalExtension();
+            $imagen->move(public_path('images'), $nombreImagen);
+            
 
             // crear el usuario
             $user = User::create([
@@ -211,4 +219,132 @@ class UserController extends Controller {
             'data'   => null
         ], 200)->withCookie($cookie);
     }
+
+    // Administrador
+
+    public function indexAdmin() {
+        return response()->json(
+            [
+                'message' => 'Usuarios obtenidos correctamente',
+                'status'  => 'success',
+                'data'    => User::all(),
+
+            ], 200
+        );
+    }
+
+    public function getUserProfile() {
+        $user = Auth::user();
+        return response()->json(
+            [
+                'message' => 'Usuario obtenido correctamente',
+                'status'  => 'success',
+                'data'    => $user
+            ], 200
+        );
+    }
+
+    public function updateProfile(Request $request) {
+        try {
+            $user = Auth::user();
+
+            $validator = Validator::make($request->all(), [
+                'nombre'   => 'required|string',
+                'telefono' => 'required|string',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'error' => $validator->errors(),
+                    'msg'   => 'No se pudo actualizar'
+                ], 500);
+            }
+
+            $user->nombre = $request->get('nombre');
+            $user->telefono = $request->get('telefono');
+            $user->save();
+
+
+            return response()->json(
+                [
+                    'message' => 'Usuario actualizado correctamente',
+                    'status'  => 'success',
+                    'data'    => $user
+                ], 200
+            );
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage(),
+                'msg'   => 'No se pudo actualizar'
+            ], 500);
+
+
+
+        }
+
+    }
+
+    public function updatePassword(Request $request) {
+        try {
+            $user = Auth::user();
+
+            $validator = Validator::make($request->all(), [
+                'password' => 'required|string|min:6',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'error' => $validator->errors(),
+                    'msg'   => 'No se pudo actualizar'
+                ], 500);
+            }
+
+            $user->password = Hash::make($request->get('password'));
+            $user->save();
+
+            return response()->json(
+                [
+                    'message' => 'Contraseña actualizada correctamente',
+                    'status'  => 'success',
+                    'data'    => $user
+                ], 200
+            );
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage(),
+                'msg'   => 'No se pudo actualizar'
+            ], 500);
+        }
+    }
+
+    public function forgotPassword(Request $request) {
+        try {
+            $validator = Validator::make($request->all(), [
+                'correo' => 'required|string|email|max:255',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'error' => $validator->errors(),
+                    'msg'   => 'No se pudo enviar el correo'
+                ], 500);
+            }
+
+            $user = User::where('correo', $request->get('correo'))->first();
+
+            if (!$user) {
+                return response()->json([
+                    'error' => 'No existe un usuario con ese correo',
+                    'msg'   => 'No se pudo enviar el correo'
+                ], 500);
+            }
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage(),
+                'msg'   => 'No se pudo enviar el correo'
+            ], 500);
+        }
+    }
+
 }

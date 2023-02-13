@@ -39,30 +39,6 @@ class OrderdetailController extends Controller {
             );
         }
 
-        // segunda forma con with que es mas facil pero no se puede hacer un select y esto quiere decir que trae todos los campos de la tabla orderdetails y de la tabla products
-        // try {
-        //     $orderdetails = Orderdetail::with('product')->get(); 
-        //     return response()->json(
-        //         [
-        //             'message' => 'Ordenes obtenidas correctamente',
-        //             'status'  => 'success',
-        //             'data'    => $orderdetails,
-
-        //         ], 200
-        //     );
-
-        // } catch (\Throwable $th) {
-        //     return response()->json(
-        //         [
-        //             'message' => 'Error al obtener las ordenes',
-        //             'status'  => 'error',
-        //             'data'    => $th->getMessage(),
-
-        //         ], 500
-        //     );
-        // }
-
-
     }
 
 

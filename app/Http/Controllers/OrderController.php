@@ -162,8 +162,22 @@ class OrderController extends Controller {
         //
     }
 
-    public function getOrdersByUser($id) {
+    public function getOrdersByUser() {
         try {
+            $id = Auth::user()->id;
+
+            $exist = Order::where('user_id', $id)->exists();
+            if (!$exist) {
+                return response()->json(
+                    [
+                        'message' => 'Error al obtener las ordenes',
+                        'status'  => 'error',
+                        'data'    => 'No hay ordenes por este usuario',
+
+                    ], 500
+                );
+            }
+
             $orders = Order::join('users', 'orders.user_id', '=', 'users.id')
                 ->join('orderdetails', 'orders.orderdetail_id', '=', 'orderdetails.id')
                 ->join('products', 'orderdetails.product_id', '=', 'products.id')
@@ -184,10 +198,6 @@ class OrderController extends Controller {
 
             // sumar el total de orderdetails
             $totalSum = $orderdetails->sum('total');
-
-
-
-
 
             return response()->json(
                 [

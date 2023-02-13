@@ -141,4 +141,29 @@ class ProductController extends Controller {
         }
     }
 
+    //admin products
+    public function adminProducts() {
+        try {
+            $products = Product::all();
+            return response()->json(
+                [
+                    'message' => 'Productos obtenidos correctamente',
+                    'status'  => 'success',
+                    'data'    => $products,
+
+                ], 200
+            );
+
+        } catch (\Throwable $th) {
+            return response()->json(
+                [
+                    'message' => 'Error al obtener los productos',
+                    'status'  => 'error',
+                    'data'    => $th->getMessage(),
+
+                ], 500
+            );
+        }
+    }
+
 }
