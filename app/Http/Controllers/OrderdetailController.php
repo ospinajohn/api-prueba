@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Order;
 use App\Models\Orderdetail;
 use App\Models\Product;
 use App\Models\User;
@@ -103,6 +104,14 @@ class OrderdetailController extends Controller {
             $orderdetail->total = $totalOrder;
             $orderdetail->precio = $Product->precio;
             $orderdetail->save();
+
+            // $order = new Order;
+            // $order->user_id = Auth::user()->id;
+            // $order->orderdetail_id = $orderdetail->id;
+            // $order->fecha = date('Y-m-d');
+            // $order->estado = 'pendiente';
+            // $order->total = $totalOrder;
+            // $order->save();
 
             return response()->json(
                 [

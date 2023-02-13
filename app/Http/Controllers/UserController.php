@@ -103,6 +103,15 @@ class UserController extends Controller {
         try {
             $data = User::findOrFail($id);
             $data->update($request->all());
+
+            $users = User::where('rol', 'supervisor')->get();
+            if (count($users) >= 3 && $request->get('rol') == 'supervisor') {
+                return response()->json([
+                    'error' => 'No se puede registrar mas de 3 supervisores',
+                    'msg'   => 'No se pudo actualizar'
+                ], 500);
+            }
+
             return response()->json([
                 'data' => $data,
                 'msg'  => 'Actualizado correctamente'
@@ -168,7 +177,7 @@ class UserController extends Controller {
                 'correo'   => 'required|string|email|max:255|unique:users',
                 'password' => 'required|string|min:6',
                 'telefono' => 'required|string',
-                'imagen'  => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'imagen'   => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             ]);
 
             if ($validator->fails()) {
@@ -184,7 +193,7 @@ class UserController extends Controller {
             $imagen = $request->file('imagen');
             $nombreImagen = time() . '.' . $imagen->getClientOriginalExtension();
             $imagen->move(public_path('images'), $nombreImagen);
-            
+
 
             // crear el usuario
             $user = User::create([
